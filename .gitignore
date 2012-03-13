@@ -1,0 +1,5 @@
+*.pyc
+settings.py
+django.wsgi
+*.json
+static/admin 
