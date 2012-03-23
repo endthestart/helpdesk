@@ -1,0 +1,49 @@
+{% extends "site_base.html" %}
+
+{% load bootstrap_tags %}
+
+{% load i18n %}
+{% load ifsetting_tag %}
+
+{% block head_title %}{% trans "Open a new request." %}{% endblock %}
+
+{% block body %}
+    <h1>{% trans "Open a new ticket:" %}</h1>
+    <p>Step {{ step }} of {{ step_count }}</p>
+    {% if form.errors %}
+    <div id="form-error">
+        <p>The operation could not be performed because one or more error(s) occurred.<br />Please resubmit the form after making the following changes:</p>
+        <ul>
+        {% for field in form %}
+        <li>{{ field.errors|striptags }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        <form class="form-vertical" action="." method="post">
+            <fieldset>
+                <legend>Environment Details</legend>
+                {% csrf_token %}
+                {{ form|as_bootstrap }}
+                <input type="hidden" name="{{ step_field }}" value="{{ step0 }}" />
+                {{ previous_fields|safe }}
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">{% if step0 == 0 %}Next Step{% else %}Submit Form{% endif %}</button>
+                </div>
+            </fieldset>
+        </form>
+    {% else %}
+        {% url acct_login as login_url %}
+
+        <p class="what_next">
+            {% ifsetting ACCOUNT_OPEN_SIGNUP %}
+                {% url acct_signup as signup_url %}
+                {% blocktrans %}Start by <a href="{{ signup_url }}">signing up</a> and <a href="{{ login_url }}">logging in</a>.{% endblocktrans %}
+            {% else %}
+                {% blocktrans %}Start by <a href="{{ login_url }}">logging in</a>.{% endblocktrans %}
+            {% endifsetting %}
+        </p>
+    {% endif %}
+{% endblock %}
